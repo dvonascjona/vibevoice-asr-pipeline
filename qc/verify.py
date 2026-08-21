@@ -91,12 +91,13 @@ def check_one(srt_path, audio_path):
     issues, notes = [], []
     for where, gap, start in checks:
         ratio, mean_db = speech_ratio(audio_path, start, gap)
+        span = f"[{fmt(start)}→{fmt(start+gap)}]"   # 缺口绝对时间段, 供人工定位听音频
         if ratio is None:
-            issues.append(f"{where}缺{fmt(gap)}(未能实测)")
+            issues.append(f"{where}{span}缺{fmt(gap)}(未能实测)")
         elif ratio >= SPEECH_RATIO_FAIL:
-            issues.append(f"{where}缺{fmt(gap)}真丢内容(语音占比{ratio*100:.0f}%,均{mean_db:.0f}dB)")
+            issues.append(f"{where}{span}缺{fmt(gap)}真丢内容(语音占比{ratio*100:.0f}%,均{mean_db:.0f}dB)")
         else:
-            notes.append(f"{where}{fmt(gap)}休息/间歇(语音占比{ratio*100:.0f}%)")
+            notes.append(f"{where}{span}{fmt(gap)}休息/间歇(语音占比{ratio*100:.0f}%)")
 
     detail = dict(audio_sec=round(adur,1), srt_end=round(last,1), subs=len(segs),
                   head=round(head,1), tail=round(tail,1), mid=round(mid,1), notes=notes)
